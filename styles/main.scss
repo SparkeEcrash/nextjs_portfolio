@@ -1,17 +1,34 @@
+
 @import './shared/fonts';
+@import './shared/colors';
+@import './shared/mixins';
 
 // PAGES
 @import './index';
+@import './portfolios';
+@import './blogs';
+@import './about';
+@import './cv';
 
 // COMPONENTS
-@import './shared/header';
+@import './header';
+@import './slate-editor';
+
+.montserrat-loaded {
+	html, body {
+		font-family: 'Montserrat', 'Helvetica';
+	}
+}
 
 html, body {
 	height: 100%;
 	width: 100%;
-	font-family: 'Montserrat', 'Helvetica';
+	font-family: 'Montserrat', 'Helvetica' !important;
 }
 
+.clickable {
+	cursor: pointer;
+}
 
 .self-typed {
 	font-size: 31px;
@@ -21,10 +38,26 @@ html, body {
 }
 
 .absolute {
-	position: absolute;
+  position: absolute;
+}
+
+.error {
+	font-weight: 700;
+	color: red;
 }
 
 .base-page {
-	padding-top: 150px;
-	color: white;
+  padding: 150px 0;
+	color: black;
+	background-color: #ecedee;
+	min-height: 100vh;
+
+  .page-header {
+    .page-header-title {
+      font-weight: 700;
+      color: black;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+  }
 }

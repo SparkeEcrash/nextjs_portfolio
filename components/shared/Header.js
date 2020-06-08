@@ -1,56 +1,6 @@
-// import React from 'react';
-// import Link from 'next/link';
-// import {Link as NextLink} from '../../routes';
-
-// class Header extends React.Component {
-// 	render() {
-// 		return (
-// 			<>
-// 				<Link href="/">
-// 					<a> Home </a>
-// 				</Link>
-// 				<Link href="/about">
-// 					<a> About </a>
-// 				</Link>
-// 				<Link href="/portfolios">
-// 					<a> Portfolios </a>
-// 				</Link>
-// 				<Link href="/blog">
-// 					<a> Blog </a>
-// 				</Link>
-// 				<Link href="/cv">
-// 					<a> CV </a>
-// 				</Link>
-// 				<NextLink route='test' params={{id: '2'}}><a> Test 2 </a></NextLink>
-// 				<NextLink route='/test/5'><a> Test 5 </a></NextLink>
-// 				<style jsx>
-// 					{
-// 						`
-// 						a {
-// 							font-size: 20px;
-// 						};
-// 						`
-// 					}
-// 				</style>
-// 			</>
-// 		)
-// 	}
-// }
-
-// export default Header;
-
-const BsNavLink = props => {
-	const { route, title } = props;
-
-	return (
-		<Link href={route}>
-			<a className="nav-link port-navbar-link">{title}</a>
-		</Link>
-	)
-}
-
 import React, { useState } from "react";
 import Link from "next/link";
+import ActiveLink from '../ActiveLink';
 import {
   Collapse,
   Navbar,
@@ -58,36 +8,128 @@ import {
   NavbarBrand,
   Nav,
   NavItem,
-  NavLink
+	NavLink,
+	Dropdown,
+	DropdownItem,
+	DropdownToggle,
+	DropdownMenu
 } from "reactstrap";
+import auth0 from "../../services/auth0";
 
-const Example = props => {
-  const [isOpen, setIsOpen] = useState(false);
+const BsNavLink = (props) => {
+	const { route, title } = props;
+	const className = props.className || "";
 
-  const toggle = () => setIsOpen(!isOpen);
+  return (
+		<ActiveLink activeClassName="active" route={route}>
+			<a className={`nav-link port-navbar-link ${className}`}>{title}</a>
+		</ActiveLink>
+  );
+};
+
+const Login = () => {
+  return (
+    <span onClick={auth0.login} className="nav-link port-navbar-link clickable">
+      {" "}
+      Login{" "}
+    </span>
+  );
+};
+
+const Logout = () => {
+  return (
+    <span
+      onClick={auth0.logout}
+      className="nav-link port-navbar-link clickable"
+    >
+      {" "}
+      Logout{" "}
+    </span>
+  );
+};
+
+const Header = (props) => {
+  const { isAuthenticated, user, className } = props;
+
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [isDropdown, setIsDropdown] = useState(false);
+
+  const toggleMobileMenu = () => {
+		setIsMenuOpen(!isMenuOpen);
+	}
+
+	const toggleDropdown = () => {
+		setIsDropdown(!isDropdown);
+	}
+
+	const menuOpenClass = isMenuOpen ? 'menu-open' : 'menu-close';
+
+	const renderBlogMenu = () => {
+		const { isSiteOwner } = props;
+
+		if(isSiteOwner) {
+			return (
+				<Dropdown className="port-navbar-link port-dropdown-menu" nav isOpen={isDropdown} toggle={() => {toggleDropdown()}}>
+					<DropdownToggle className="port-dropdown-toggle" nav caret>
+						Blog
+					</DropdownToggle>
+					<DropdownMenu>
+						<DropdownItem><BsNavLink className="port-dropdown-item" route="/blogs" title="Blogs" /></DropdownItem>
+						<DropdownItem><BsNavLink className="port-dropdown-item" route="/blogs/new" title="Create a Blog" /></DropdownItem>
+						<DropdownItem><BsNavLink className="port-dropdown-item" route="/blogs/dashboard" title="Blogs Dashboard" /></DropdownItem>
+					</DropdownMenu>
+				</Dropdown>
+			)
+		}
+		return (
+			<NavItem className="port-navbar-item">
+				<BsNavLink route="/blogs" title="Blog" />
+			</NavItem>
+		)
+	}
 
   return (
     <div>
-      <Navbar className="port-navbar port-default absolute" color="transparent" dark expand="md">
-        <NavbarBrand className="port-navbar-brand" href="/">James Park</NavbarBrand>
-        <NavbarToggler onClick={toggle} />
-        <Collapse isOpen={isOpen} navbar>
+      <Navbar
+        className={`port-navbar port-nav-base absolute ${className} ${menuOpenClass}`}
+        color="transparent"
+        dark
+        expand="md"
+      >
+        <NavbarBrand className="port-navbar-brand" href="/">
+          James Park
+        </NavbarBrand>
+        <NavbarToggler onClick={() => {toggleMobileMenu()}} />
+        <Collapse isOpen={isMenuOpen} navbar>
           <Nav className="ml-auto" navbar>
             <NavItem className="port-navbar-item">
-							<BsNavLink route="/" title="Home"/>
-            </NavItem>
-						<NavItem className="port-navbar-item">
-							<BsNavLink route="/about" title="About"/>
+              <BsNavLink route="/" title="Home" />
             </NavItem>
             <NavItem className="port-navbar-item">
-							<BsNavLink route="/portfolios" title="Portfolio"/>
+              <BsNavLink route="/about" title="About" />
             </NavItem>
             <NavItem className="port-navbar-item">
-							<BsNavLink route="/blogs" title="Blog"/>
+              <BsNavLink route="/portfolios" title="Portfolio" />
             </NavItem>
+						{renderBlogMenu()}
             <NavItem className="port-navbar-item">
-							<BsNavLink route="/cv" title="Cv"/>
+              <BsNavLink route="/cv" title="Cv" />
             </NavItem>
+            {!isAuthenticated && (
+              <NavItem className="port-navbar-item">
+                <Login />
+              </NavItem>
+            )}
+            {isAuthenticated && (
+              <NavItem className="port-navbar-item">
+                <Logout />
+              </NavItem>
+            )}
+            {isAuthenticated && (
+              <NavItem className="port-navbar-item">
+                <span className="nav-link port-navbar-link">{user.name}</span>
+              </NavItem>
+            )}
           </Nav>
         </Collapse>
       </Navbar>
@@ -95,4 +137,4 @@ const Example = props => {
   );
 };
 
-export default Example;
+export default Header;

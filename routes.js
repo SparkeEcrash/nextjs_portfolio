@@ -1,11 +1,10 @@
-//THIS ENABLES DYNAMIC ROUTING WITHOUT HAVING TO MAKE FOLDERS LIKE [id] WITH FILES UNDERNEATH
+const routes = require('next-routes');
 
-const routes = require('next-routes')
-
-                                                    // Name   Page      Pattern
-module.exports = routes()                           // ----   ----      -----
-	.add('test', '/test/:id')
-//http://localhost:3000/test/2
-
-
-// https://github.com/fridays/next-routes
+module.exports = routes()
+.add('portfolioNew', '/portfolios/new')
+.add('portfolio', '/portfolio/:id')
+.add('portfolioEdit', '/portfolios/:id/edit')
+.add('userBlogs', '/blogs/dashboard')
+.add('blogEditor', '/blogs/new')
+.add('blogDetail', '/blogs/:slug')
+.add('blogEditorUpdate', '/blogs/:id/edit')
